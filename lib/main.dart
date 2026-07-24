@@ -22,7 +22,6 @@ class WoraWebApp extends StatelessWidget {
   }
 }
 
-// 악보 아이템 모델 (이름 순서 정렬 지원)
 class ScoreItem implements Comparable<ScoreItem> {
   final String id;
   final String title;
@@ -36,7 +35,6 @@ class ScoreItem implements Comparable<ScoreItem> {
   }
 }
 
-// 로컬 보관함 저장소
 class ScoreRepository {
   static final List<ScoreItem> _storage = [];
 
@@ -54,7 +52,6 @@ class ScoreRepository {
   }
 }
 
-// 1. 감성적인 그라데이션 배경을 가진 홈 화면 (회원가입 생략 및 바로 입장)
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -109,7 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        // 딱딱하지 않고 부드러운 감성 그라데이션 배경 적용
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -234,11 +230,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// 펜 종류 및 지우개 크기 정의
 enum PenType { fountain, ballpoint, highlighter, pencil, eraser }
 enum EraserSize { small, medium, large }
 
-// 2. 편집 및 뷰어 화면 (좌표 오정렬 수정 및 다양한 지우개 크기 반영)
 class EditorScreen extends StatefulWidget {
   final String nickname;
   final String role;
@@ -257,7 +251,7 @@ class EditorScreen extends StatefulWidget {
 
 class _EditorScreenState extends State<EditorScreen> {
   PenType _currentPen = PenType.ballpoint;
-  EraserSize _eraserSize = EraserSize.medium; // 기본 지우개 크기
+  EraserSize _eraserSize = EraserSize.medium;
   Color _currentColor = Colors.black;
   final List<DrawingPoint?> _points = [];
   bool _hasGalleryImage = false;
@@ -305,7 +299,6 @@ class _EditorScreenState extends State<EditorScreen> {
     );
   }
 
-  // 지우개 굵기 값 반환 함수
   double _getEraserWidth() {
     switch (_eraserSize) {
       case EraserSize.small:
@@ -338,7 +331,6 @@ class _EditorScreenState extends State<EditorScreen> {
       ),
       body: Column(
         children: [
-          // 툴바 영역 (펜 종류 및 지우개 크기 세부 조절 지원)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             color: const Color(0xFFE2E8F0),
@@ -354,7 +346,6 @@ class _EditorScreenState extends State<EditorScreen> {
                 _buildPenButton(PenType.pencil, '연필', Icons.mode_edit_outline),
                 _buildPenButton(PenType.eraser, '지우개', Icons.cleaning_services),
                 
-                // 지우개 선택 시에만 크기 조절 옵션 노출
                 if (_currentPen == PenType.eraser) ...[
                   const VerticalDivider(width: 12, thickness: 1),
                   _buildEraserSizeChip(EraserSize.small, '지우개 얇게'),
@@ -370,19 +361,15 @@ class _EditorScreenState extends State<EditorScreen> {
               ],
             ),
           ),
-          // 캔버스 영역 (오프셋 완벽 매칭을 위한 InteractiveViewer 적용)
           Expanded(
             child: InteractiveViewer(
               transformationController: _transformationController,
               boundaryMargin: const EdgeInsets.all(500),
               minScale: 0.5,
               maxScale: 5.0,
-              panEnabled: _currentPen != PenType.fountain && _currentPen != PenType.ballpoint && _currentPen != PenType.highlighter && _currentPen != PenType.pencil && _currentPen != PenType.eraser, 
-              // 드로잉 시 화면 스크롤과 터치 위치 충돌을 막기 위해 펜 사용 중에는 제스처 매핑 조정
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onPanStart: (details) {
-                  // 터치 위치 오류 수정을 위해 Matrix 변환 적용
                   final localPos = _transformationController.toScene(details.localPosition);
                   setState(() {
                     _points.add(DrawingPoint(
@@ -533,7 +520,6 @@ class ScorePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
-// 3. 악보 보관함 화면 (이름 순서 자동 정렬)
 class ScoreLibraryScreen extends StatefulWidget {
   const ScoreLibraryScreen({super.key});
 
