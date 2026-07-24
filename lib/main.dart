@@ -14,15 +14,15 @@ class WoraWebApp extends StatelessWidget {
       title: 'WORA Web',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         useMaterial3: true,
       ),
-      home: const AuthScreen(),
+      home: const HomeScreen(),
     );
   }
 }
 
-// 1. 악보 아이템 모델 (이름 순서 정렬 지원)
+// 악보 아이템 모델 (이름 순서 정렬 지원)
 class ScoreItem implements Comparable<ScoreItem> {
   final String id;
   final String title;
@@ -32,7 +32,6 @@ class ScoreItem implements Comparable<ScoreItem> {
 
   @override
   int compareTo(ScoreItem other) {
-    // 이름 순서(가나다/ABC 순) 정렬
     return title.compareTo(other.title);
   }
 }
@@ -55,87 +54,7 @@ class ScoreRepository {
   }
 }
 
-// 2. 회원가입 및 로그인 화면
-class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key});
-
-  @override
-  State<AuthScreen> createState() => _AuthScreenState();
-}
-
-class _AuthScreenState extends State<AuthScreen> {
-  final _idController = TextEditingController();
-  final _pwController = TextEditingController();
-
-  void _handleLogin() {
-    if (_idController.text.isEmpty || _pwController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('아이디와 비밀번호를 모두 입력해주세요.')),
-      );
-      return;
-    }
-    // 회원가입/로그인 후 홈으로 이동
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('WORA 웹 - 회원가입 및 로그인'), centerTitle: true),
-      body: Center(
-        child: Container(
-          width: 400,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 10, spreadRadius: 2)],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('계정 접속', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _idController,
-                decoration: const InputDecoration(
-                  labelText: '아이디',
-                  hintText: '아이디를 입력하세요',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _pwController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: '비밀번호',
-                  hintText: '비밀번호를 입력하세요',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey, foregroundColor: Colors.white),
-                  onPressed: _handleLogin,
-                  child: const Text('회원가입 / 로그인', style: TextStyle(fontSize: 16)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// 3. 홈 화면 (닉네임 직접 입력, 역할 분류, 방 입장)
+// 1. 감성적인 그라데이션 배경을 가진 홈 화면 (회원가입 생략 및 바로 입장)
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -146,15 +65,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _nicknameController = TextEditingController();
   final _roomPasswordController = TextEditingController();
-  String _selectedRole = '참여자'; // 인도자 또는 참여자 분류
+  String _selectedRole = '참여자';
 
   void _enterRoom() {
-    String nickname = _nicknameController.text;
+    String nickname = _nicknameController.text.trim();
     String pw = _roomPasswordController.text;
 
     if (nickname.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('사용할 닉네임을 직접 입력해주세요.')),
+        const SnackBar(content: Text('사용할 닉네임을 입력해주세요.')),
       );
       return;
     }
@@ -189,91 +108,125 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('WORA 웹 악보 협업 공간'), centerTitle: true),
-      body: Center(
-        child: Container(
-          width: 420,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 10, spreadRadius: 2)],
+      body: Container(
+        // 딱딱하지 않고 부드러운 감성 그라데이션 배경 적용
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF6884B1), Color(0xFFE2E8F0), Color(0xFFF8FAFC)],
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('방 입장 설정', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-              // 닉네임 직접 입력 필드
-              TextField(
-                controller: _nicknameController,
-                decoration: const InputDecoration(
-                  labelText: '내 닉네임 입력',
-                  hintText: '사용할 이름을 적어주세요',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // 인도자 / 참여자 분류 선택
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('역할 선택: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 10),
-                  ChoiceChip(
-                    label: const Text('인도자'),
-                    selected: _selectedRole == '인도자',
-                    selectedColor: Colors.blueGrey,
-                    onSelected: (selected) => setState(() => _selectedRole = '인도자'),
-                  ),
-                  const SizedBox(width: 10),
-                  ChoiceChip(
-                    label: const Text('참여자'),
-                    selected: _selectedRole == '참여자',
-                    selectedColor: Colors.blueGrey,
-                    onSelected: (selected) => setState(() => _selectedRole = '참여자'),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Container(
+              width: 440,
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.92),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 20,
+                    spreadRadius: 5,
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              // 6자리 방 비밀번호 입력 (000000 포맷 힌트)
-              TextField(
-                controller: _roomPasswordController,
-                keyboardType: TextInputType.number,
-                maxLength: 6,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(
-                  labelText: '방 비밀번호 (000001 ~ 999999)',
-                  hintText: '000000',
-                  border: OutlineInputBorder(),
-                  counterText: '',
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.music_note_rounded, size: 48, color: Color(0xFF4F46E5)),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'WORA 웹 악보 협업',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    '실시간으로 악보를 공유하고 함께 소통하세요',
+                    style: TextStyle(fontSize: 14, color: Color(0xFF64748B)),
+                  ),
+                  const SizedBox(height: 28),
+                  TextField(
+                    controller: _nicknameController,
+                    decoration: InputDecoration(
+                      labelText: '내 닉네임',
+                      hintText: '사용할 이름을 적어주세요',
+                      prefixIcon: const Icon(Icons.person_outline),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('역할: ', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF475569))),
+                      const SizedBox(width: 12),
+                      ChoiceChip(
+                        label: const Text('인도자'),
+                        selected: _selectedRole == '인도자',
+                        selectedColor: const Color(0xFFC7D2FE),
+                        onSelected: (selected) => setState(() => _selectedRole = '인도자'),
+                      ),
+                      const SizedBox(width: 12),
+                      ChoiceChip(
+                        label: const Text('참여자'),
+                        selected: _selectedRole == '참여자',
+                        selectedColor: const Color(0xFFC7D2FE),
+                        onSelected: (selected) => setState(() => _selectedRole = '참여자'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: _roomPasswordController,
+                    keyboardType: TextInputType.number,
+                    maxLength: 6,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: InputDecoration(
+                      labelText: '방 비밀번호 (6자리)',
+                      hintText: '000000',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      counterText: '',
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4F46E5),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 2,
+                      ),
+                      onPressed: _enterRoom,
+                      child: const Text('방 입장하기', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ScoreLibraryScreen()),
+                        );
+                      },
+                      child: const Text('악보 보관함 열기 (이름순)', style: TextStyle(fontSize: 15)),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey, foregroundColor: Colors.white),
-                  onPressed: _enterRoom,
-                  child: const Text('방 입장하기', style: TextStyle(fontSize: 16)),
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ScoreLibraryScreen()),
-                    );
-                  },
-                  child: const Text('악보 보관함 열기 (이름순)', style: TextStyle(fontSize: 16)),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -281,10 +234,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// 굿노트 스타일 펜 5가지 종류
+// 펜 종류 및 지우개 크기 정의
 enum PenType { fountain, ballpoint, highlighter, pencil, eraser }
+enum EraserSize { small, medium, large }
 
-// 4. 악보 편집 및 뷰어 화면 (굿노트 감성)
+// 2. 편집 및 뷰어 화면 (좌표 오정렬 수정 및 다양한 지우개 크기 반영)
 class EditorScreen extends StatefulWidget {
   final String nickname;
   final String role;
@@ -303,11 +257,13 @@ class EditorScreen extends StatefulWidget {
 
 class _EditorScreenState extends State<EditorScreen> {
   PenType _currentPen = PenType.ballpoint;
+  EraserSize _eraserSize = EraserSize.medium; // 기본 지우개 크기
   Color _currentColor = Colors.black;
   final List<DrawingPoint?> _points = [];
   bool _hasGalleryImage = false;
+  
+  final TransformationController _transformationController = TransformationController();
 
-  // 갤러리 악보 불러오기 가상 연동
   void _pickImageFromGallery() {
     setState(() {
       _hasGalleryImage = true;
@@ -317,7 +273,6 @@ class _EditorScreenState extends State<EditorScreen> {
     );
   }
 
-  // 악보 저장하기
   void _saveScoreToLibrary() {
     TextEditingController titleController = TextEditingController();
     showDialog(
@@ -350,11 +305,24 @@ class _EditorScreenState extends State<EditorScreen> {
     );
   }
 
+  // 지우개 굵기 값 반환 함수
+  double _getEraserWidth() {
+    switch (_eraserSize) {
+      case EraserSize.small:
+        return 15.0;
+      case EraserSize.medium:
+        return 35.0;
+      case EraserSize.large:
+        return 70.0;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('[${widget.role}] ${widget.nickname} | 방: ${widget.roomPassword}'),
+        backgroundColor: const Color(0xFFF1F5F9),
         actions: [
           IconButton(
             icon: const Icon(Icons.photo_library),
@@ -370,20 +338,31 @@ class _EditorScreenState extends State<EditorScreen> {
       ),
       body: Column(
         children: [
-          // 굿노트 스타일 5가지 펜 툴바
+          // 툴바 영역 (펜 종류 및 지우개 크기 세부 조절 지원)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: Colors.grey[200],
+            color: const Color(0xFFE2E8F0),
             child: Wrap(
               alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapAlignment.center,
               spacing: 6,
+              runSpacing: 4,
               children: [
                 _buildPenButton(PenType.fountain, '만년필', Icons.edit),
                 _buildPenButton(PenType.ballpoint, '볼펜', Icons.create),
                 _buildPenButton(PenType.highlighter, '형광펜', Icons.highlight),
                 _buildPenButton(PenType.pencil, '연필', Icons.mode_edit_outline),
                 _buildPenButton(PenType.eraser, '지우개', Icons.cleaning_services),
-                const SizedBox(width: 10),
+                
+                // 지우개 선택 시에만 크기 조절 옵션 노출
+                if (_currentPen == PenType.eraser) ...[
+                  const VerticalDivider(width: 12, thickness: 1),
+                  _buildEraserSizeChip(EraserSize.small, '지우개 얇게'),
+                  _buildEraserSizeChip(EraserSize.medium, '지우개 보통'),
+                  _buildEraserSizeChip(EraserSize.large, '지우개 두껍게'),
+                ],
+
+                const VerticalDivider(width: 12, thickness: 1),
                 _buildColorCircle(Colors.black),
                 _buildColorCircle(Colors.red),
                 _buildColorCircle(Colors.blue),
@@ -391,53 +370,70 @@ class _EditorScreenState extends State<EditorScreen> {
               ],
             ),
           ),
-          // 굿노트 넓은 악보 칸 (줌 및 와이드 캔버스)
+          // 캔버스 영역 (오프셋 완벽 매칭을 위한 InteractiveViewer 적용)
           Expanded(
             child: InteractiveViewer(
-              boundaryMargin: const EdgeInsets.all(300),
+              transformationController: _transformationController,
+              boundaryMargin: const EdgeInsets.all(500),
               minScale: 0.5,
               maxScale: 5.0,
-              child: Container(
-                color: Colors.white,
-                width: 3000,
-                height: 3000,
-                child: Stack(
-                  children: [
-                    if (_hasGalleryImage)
-                      Positioned.fill(
-                        child: Container(
-                          color: Colors.blueGrey.withOpacity(0.05),
-                          child: const Center(
-                            child: Text('🎵 [갤러리 악보 배경 로드됨]', style: TextStyle(color: Colors.blueGrey, fontSize: 20, fontWeight: FontWeight.bold)),
+              panEnabled: _currentPen != PenType.fountain && _currentPen != PenType.ballpoint && _currentPen != PenType.highlighter && _currentPen != PenType.pencil && _currentPen != PenType.eraser, 
+              // 드로잉 시 화면 스크롤과 터치 위치 충돌을 막기 위해 펜 사용 중에는 제스처 매핑 조정
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onPanStart: (details) {
+                  // 터치 위치 오류 수정을 위해 Matrix 변환 적용
+                  final localPos = _transformationController.toScene(details.localPosition);
+                  setState(() {
+                    _points.add(DrawingPoint(
+                      point: localPos,
+                      type: _currentPen,
+                      color: _currentPen == PenType.eraser ? Colors.white : _currentColor,
+                      strokeWidth: _currentPen == PenType.highlighter 
+                          ? 20.0 
+                          : (_currentPen == PenType.eraser ? _getEraserWidth() : 3.0),
+                    ));
+                  });
+                },
+                onPanUpdate: (details) {
+                  final localPos = _transformationController.toScene(details.localPosition);
+                  setState(() {
+                    _points.add(DrawingPoint(
+                      point: localPos,
+                      type: _currentPen,
+                      color: _currentPen == PenType.eraser ? Colors.white : _currentColor,
+                      strokeWidth: _currentPen == PenType.highlighter 
+                          ? 20.0 
+                          : (_currentPen == PenType.eraser ? _getEraserWidth() : 3.0),
+                    ));
+                  });
+                },
+                onPanEnd: (details) {
+                  setState(() {
+                    _points.add(null);
+                  });
+                },
+                child: Container(
+                  color: Colors.white,
+                  width: 3000,
+                  height: 3000,
+                  child: Stack(
+                    children: [
+                      if (_hasGalleryImage)
+                        Positioned.fill(
+                          child: Container(
+                            color: Colors.indigo.withOpacity(0.03),
+                            child: const Center(
+                              child: Text('🎵 [갤러리 악보 배경 로드됨]', style: TextStyle(color: Colors.indigo, fontSize: 20, fontWeight: FontWeight.bold)),
+                            ),
                           ),
                         ),
+                      CustomPaint(
+                        painter: ScorePainter(points: _points),
+                        size: Size.infinite,
                       ),
-                    Positioned.fill(
-                      child: GestureDetector(
-                        onPanUpdate: (details) {
-                          setState(() {
-                            RenderBox renderBox = context.findRenderObject() as RenderBox;
-                            Offset localPosition = renderBox.globalToLocal(details.globalPosition);
-                            _points.add(DrawingPoint(
-                              point: localPosition,
-                              type: _currentPen,
-                              color: _currentPen == PenType.eraser ? Colors.white : _currentColor,
-                              strokeWidth: _currentPen == PenType.highlighter ? 20.0 : 3.0,
-                            ));
-                          });
-                        },
-                        onPanEnd: (details) {
-                          setState(() {
-                            _points.add(null);
-                          });
-                        },
-                        child: CustomPaint(
-                          painter: ScorePainter(points: _points),
-                          size: Size.infinite,
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -451,9 +447,10 @@ class _EditorScreenState extends State<EditorScreen> {
     bool isSelected = _currentPen == type;
     return ChoiceChip(
       label: Text(label),
-      avatar: Icon(icon, size: 16, color: isSelected ? Colors.white : Colors.black),
+      avatar: Icon(icon, size: 16, color: isSelected ? Colors.white : Colors.black87),
       selected: isSelected,
-      selectedColor: Colors.blueGrey,
+      selectedColor: const Color(0xFF4F46E5),
+      labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black87),
       onSelected: (selected) {
         setState(() {
           _currentPen = type;
@@ -462,6 +459,20 @@ class _EditorScreenState extends State<EditorScreen> {
           } else if (type != PenType.eraser) {
             _currentColor = Colors.black;
           }
+        });
+      },
+    );
+  }
+
+  Widget _buildEraserSizeChip(EraserSize size, String label) {
+    bool isSelected = _eraserSize == size;
+    return ChoiceChip(
+      label: Text(label, style: const TextStyle(fontSize: 12)),
+      selected: isSelected,
+      selectedColor: const Color(0xFF94A3B8),
+      onSelected: (selected) {
+        setState(() {
+          _eraserSize = size;
         });
       },
     );
@@ -503,6 +514,7 @@ class ScorePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()
       ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
       ..isAntiAlias = true;
 
     for (int i = 0; i < points.length - 1; i++) {
@@ -521,7 +533,7 @@ class ScorePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
-// 5. 악보 보관함 화면 (이름 순서 자동 정렬)
+// 3. 악보 보관함 화면 (이름 순서 자동 정렬)
 class ScoreLibraryScreen extends StatefulWidget {
   const ScoreLibraryScreen({super.key});
 
@@ -540,7 +552,7 @@ class _ScoreLibraryScreenState extends State<ScoreLibraryScreen> {
 
   void _loadScores() {
     setState(() {
-      _scoreList = ScoreRepository.getSortedScores(); // 이름순 정렬
+      _scoreList = ScoreRepository.getSortedScores();
     });
   }
 
@@ -549,6 +561,7 @@ class _ScoreLibraryScreenState extends State<ScoreLibraryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('악보 보관함 (이름 순서 정렬)'),
+        backgroundColor: const Color(0xFFF1F5F9),
         centerTitle: true,
       ),
       body: _scoreList.isEmpty
@@ -560,7 +573,7 @@ class _ScoreLibraryScreenState extends State<ScoreLibraryScreen> {
                 return Card(
                   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: ListTile(
-                    leading: const Icon(Icons.music_note, color: Colors.blueGrey, size: 32),
+                    leading: const Icon(Icons.music_note, color: Color(0xFF4F46E5), size: 32),
                     title: Text(score.title, style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text('저장 일시: ${score.createdAt.toLocal().toString().split('.')[0]}'),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
