@@ -255,8 +255,6 @@ class _EditorScreenState extends State<EditorScreen> {
   Color _currentColor = Colors.black;
   final List<DrawingPoint?> _points = [];
   bool _hasGalleryImage = false;
-  
-  final TransformationController _transformationController = TransformationController();
 
   void _pickImageFromGallery() {
     setState(() {
@@ -348,9 +346,9 @@ class _EditorScreenState extends State<EditorScreen> {
                 
                 if (_currentPen == PenType.eraser) ...[
                   const VerticalDivider(width: 12, thickness: 1),
-                  _buildEraserSizeChip(EraserSize.small, '지우개 얇게'),
-                  _buildEraserSizeChip(EraserSize.medium, '지우개 보통'),
-                  _buildEraserSizeChip(EraserSize.large, '지우개 두껍게'),
+                  _buildEraserSizeChip(EraserSize.small, '얇게'),
+                  _buildEraserSizeChip(EraserSize.medium, '보통'),
+                  _buildEraserSizeChip(EraserSize.large, '두껍게'),
                 ],
 
                 const VerticalDivider(width: 12, thickness: 1),
@@ -363,17 +361,15 @@ class _EditorScreenState extends State<EditorScreen> {
           ),
           Expanded(
             child: InteractiveViewer(
-              transformationController: _transformationController,
               boundaryMargin: const EdgeInsets.all(500),
               minScale: 0.5,
               maxScale: 5.0,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onPanStart: (details) {
-                  final localPos = _transformationController.toScene(details.localPosition);
                   setState(() {
                     _points.add(DrawingPoint(
-                      point: localPos,
+                      point: details.localPosition,
                       type: _currentPen,
                       color: _currentPen == PenType.eraser ? Colors.white : _currentColor,
                       strokeWidth: _currentPen == PenType.highlighter 
@@ -383,10 +379,9 @@ class _EditorScreenState extends State<EditorScreen> {
                   });
                 },
                 onPanUpdate: (details) {
-                  final localPos = _transformationController.toScene(details.localPosition);
                   setState(() {
                     _points.add(DrawingPoint(
-                      point: localPos,
+                      point: details.localPosition,
                       type: _currentPen,
                       color: _currentPen == PenType.eraser ? Colors.white : _currentColor,
                       strokeWidth: _currentPen == PenType.highlighter 
